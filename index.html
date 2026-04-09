@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>퍼니 숨바꼭질 V2 — 일쉼지원센터 4주년</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #6B4C9A;
+  --purple-light: #9B7DC8;
+  --purple-pale: #F0EBF8;
+  --purple-deep: #3D2660;
+  --lavender: #C9B8E8;
+  --gold: #C4954A;
+  --gray-dark: #2C2C2C;
+  --gray-mid: #666;
+  --gray-light: #F5F5F0;
+  --white: #FEFEFE;
+  --green: #4A7C59;
+  --red: #B5382A;
+  --yellow: #C4954A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #1A0F2E;
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 배경 별빛 효과 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(107,76,154,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(107,76,154,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(30,15,60,1) 0%, #1A0F2E 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 80px; }
+
+/* 스크린 전환 */
+.screen { display: none; padding: 24px 20px; animation: fadeUp 0.4s ease; }
+.screen.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 헤더 */
+.top-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(26,15,46,0.92);
+  backdrop-filter: blur(12px);
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(201,184,232,0.15);
+}
+.top-bar .logo {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 14px; color: var(--lavender); letter-spacing: 0.05em;
+}
+.top-bar .score-chip {
+  background: rgba(107,76,154,0.4);
+  border: 1px solid var(--lavender);
+  border-radius: 20px; padding: 4px 14px;
+  font-size: 13px; color: var(--lavender); font-weight: 500;
+}
+
+/* 신호등 */
+.signal-wrap {
+  display: flex; justify-content: center;
+  padding: 32px 0 16px;
+}
+.signal {
+  width: 72px; background: #0D0720;
+  border: 2px solid rgba(201,184,232,0.3);
+  border-radius: 40px; padding: 12px 10px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 0 30px rgba(107,76,154,0.3);
+}
+.bulb {
+  width: 48px; height: 48px; border-radius: 50%;
+  transition: all 0.6s ease;
+}
+.bulb.red { background: rgba(181,56,42,0.2); }
+.bulb.yellow { background: rgba(196,149,74,0.2); }
+.bulb.purple { background: rgba(107,76,154,0.2); }
+.bulb.red.on { background: #E84040; box-shadow: 0 0 20px #E84040, 0 0 40px rgba(232,64,64,0.5); }
+.bulb.yellow.on { background: #F0A030; box-shadow: 0 0 20px #F0A030, 0 0 40px rgba(240,160,48,0.5); }
+.bulb.purple.on { background: #9B7DC8; box-shadow: 0 0 20px #9B7DC8, 0 0 40px rgba(155,125,200,0.5); }
+
+/* 제목 텍스트 */
+.title-main {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 28px; font-weight: 700;
+  text-align: center; line-height: 1.4;
+  color: var(--white);
+  text-shadow: 0 0 30px rgba(155,125,200,0.5);
+}
+.title-sub {
+  text-align: center; font-size: 14px;
+  color: var(--lavender); margin-top: 8px;
+  letter-spacing: 0.05em;
+}
+.desc {
+  font-size: 14px; line-height: 1.8;
+  color: rgba(255,255,255,0.7);
+  text-align: center; margin: 20px 0;
+}
+
+/* 입력 필드 */
+.input-wrap { margin: 24px 0; }
+.input-label { font-size: 13px; color: var(--lavender); margin-bottom: 8px; display: block; }
+.text-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,184,232,0.3);
+  border-radius: 12px; padding: 14px 16px;
+  font-size: 16px; color: var(--white);
+  font-family: 'Noto Sans KR', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+.text-input:focus { border-color: var(--lavender); }
+.text-input::placeholder { color: rgba(255,255,255,0.3); }
+
+/* 버튼 */
+.btn {
+  width: 100%; padding: 16px;
+  border-radius: 14px; border: none;
+  font-size: 16px; font-weight: 500;
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(107,76,154,0.4);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(107,76,154,0.5); }
+.btn-primary:active { transform: translateY(0); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(201,184,232,0.4);
+  color: var(--lavender);
+  margin-top: 10px;
+}
+.btn-outline:hover { background: rgba(201,184,232,0.08); }
+
+/* 코너 카드 */
+.corner-list { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+.corner-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,184,232,0.15);
+  border-radius: 16px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer; transition: all 0.2s;
+  text-decoration: none;
+}
+.corner-card:hover { background: rgba(107,76,154,0.15); border-color: rgba(201,184,232,0.4); transform: translateX(4px); }
+.corner-card.done { opacity: 0.6; pointer-events: none; }
+.corner-card.done .corner-arrow { color: #4A7C59; }
+.corner-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  background: rgba(107,76,154,0.3);
+  border: 1px solid rgba(201,184,232,0.2);
+}
+.corner-info { flex: 1; }
+.corner-name { font-size: 15px; font-weight: 500; color: var(--white); margin-bottom: 3px; }
+.corner-desc { font-size: 12px; color: rgba(255,255,255,0.5); }
+.corner-pts { font-size: 13px; color: var(--lavender); font-weight: 500; white-space: nowrap; }
+.corner-arrow { font-size: 18px; color: rgba(201,184,232,0.5); }
+
+/* 동화 카드 */
+.tale-card {
+  background: rgba(107,76,154,0.12);
+  border: 1px solid rgba(201,184,232,0.2);
+  border-radius: 16px; padding: 24px 20px;
+  margin: 16px 0;
+}
+.tale-label {
+  font-size: 11px; letter-spacing: 0.1em;
+  color: var(--lavender); margin-bottom: 12px;
+  text-transform: uppercase;
+}
+.tale-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 15px; line-height: 2;
+  color: rgba(255,255,255,0.88);
+}
+.tale-text strong { color: var(--lavender); }
+
+/* 퀴즈 */
+.quiz-question {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 17px; line-height: 1.8;
+  color: var(--white); margin: 20px 0;
+  padding: 20px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid var(--lavender);
+  border-radius: 0 12px 12px 0;
+}
+.options { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+.option-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(201,184,232,0.2);
+  border-radius: 12px; padding: 16px 20px;
+  text-align: left; font-size: 14px; line-height: 1.6;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Noto Sans KR', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.option-btn:hover { background: rgba(107,76,154,0.2); border-color: var(--lavender); }
+.option-btn.correct { background: rgba(74,124,89,0.25); border-color: #6DBF82; color: #A8E6B8; }
+.option-btn.wrong { background: rgba(181,56,42,0.2); border-color: #E06060; color: #F0A0A0; }
+.option-btn:disabled { cursor: default; }
+
+/* 피드백 */
+.feedback-card {
+  border-radius: 16px; padding: 20px;
+  margin: 16px 0; text-align: center;
+  animation: fadeUp 0.4s ease;
+}
+.feedback-card.correct { background: rgba(74,124,89,0.2); border: 1px solid rgba(109,191,130,0.4); }
+.feedback-card.wrong { background: rgba(181,56,42,0.15); border: 1px solid rgba(224,96,96,0.3); }
+.feedback-icon { font-size: 36px; margin-bottom: 8px; }
+.feedback-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.feedback-card.correct .feedback-title { color: #6DBF82; }
+.feedback-card.wrong .feedback-title { color: #E06060; }
+.feedback-reward {
+  font-size: 14px; color: var(--lavender);
+  background: rgba(107,76,154,0.2);
+  border-radius: 8px; padding: 8px 14px;
+  display: inline-block; margin-top: 10px;
+}
+
+/* OX 퀴즈 */
+.ox-question {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,184,232,0.15);
+  border-radius: 16px; padding: 20px;
+  margin: 12px 0;
+}
+.ox-q-num { font-size: 11px; color: var(--lavender); margin-bottom: 8px; letter-spacing: 0.05em; }
+.ox-q-text { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.9); margin-bottom: 14px; }
+.ox-q-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 6px; line-height: 1.6; }
+.ox-btns { display: flex; gap: 10px; }
+.ox-btn {
+  flex: 1; padding: 12px;
+  border-radius: 10px; border: 1px solid rgba(201,184,232,0.2);
+  font-size: 20px; cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.2s; color: white;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.ox-btn:hover { transform: scale(1.03); }
+.ox-btn.selected-o { background: rgba(181,56,42,0.3); border-color: #E06060; }
+.ox-btn.selected-x { background: rgba(74,124,89,0.3); border-color: #6DBF82; }
+
+/* 진단 결과 */
+.result-signal {
+  display: flex; justify-content: center;
+  padding: 24px 0;
+}
+.result-bulb-single {
+  width: 80px; height: 80px; border-radius: 50%;
+  margin: 0 auto;
+  transition: all 0.6s ease;
+}
+.result-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px; font-weight: 700;
+  text-align: center; margin: 12px 0 6px;
+}
+.result-label {
+  text-align: center; font-size: 14px;
+  color: var(--lavender); margin-bottom: 20px;
+}
+.result-desc {
+  font-size: 14px; line-height: 1.9;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px; padding: 20px;
+  border: 1px solid rgba(201,184,232,0.15);
+}
+.count-badge {
+  text-align: center; margin: 16px 0;
+  font-size: 40px; font-weight: 700; color: var(--lavender);
+  font-family: 'Noto Serif KR', serif;
+}
+
+/* 랭킹 */
+.rank-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,184,232,0.1);
+  border-radius: 12px; margin-bottom: 8px;
+}
+.rank-item.me { border-color: var(--lavender); background: rgba(107,76,154,0.15); }
+.rank-no {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.rank-no.gold { background: rgba(196,149,74,0.3); color: #F0C060; }
+.rank-no.silver { background: rgba(180,180,180,0.2); color: #C0C0C0; }
+.rank-no.bronze { background: rgba(176,100,50,0.2); color: #C08050; }
+.rank-no.normal { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+.rank-name { flex: 1; font-size: 14px; font-weight: 500; color: var(--white); }
+.rank-pts { font-size: 15px; font-weight: 700; color: var(--lavender); }
+.rank-bar-wrap { height: 3px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 4px; }
+.rank-bar { height: 3px; border-radius: 3px; background: var(--lavender); transition: width 0.8s ease; }
+
+/* 임명장 */
+.cert-wrap {
+  background: linear-gradient(135deg, rgba(107,76,154,0.2) 0%, rgba(61,38,96,0.3) 100%);
+  border: 1px solid var(--lavender);
+  border-radius: 20px; padding: 32px 24px;
+  text-align: center; margin: 16px 0;
+  position: relative; overflow: hidden;
+}
+.cert-wrap::before {
+  content: '';
+  position: absolute; inset: 4px;
+  border: 1px solid rgba(201,184,232,0.2);
+  border-radius: 16px; pointer-events: none;
+}
+.cert-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 13px; letter-spacing: 0.15em;
+  color: var(--lavender); margin-bottom: 20px;
+}
+.cert-name {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 28px; font-weight: 700;
+  color: var(--white); margin: 8px 0;
+}
+.cert-sub {
+  font-size: 14px; color: rgba(255,255,255,0.6);
+  line-height: 1.8; margin: 16px 0;
+}
+.cert-seal {
+  font-size: 48px; margin: 12px 0;
+  filter: drop-shadow(0 0 12px rgba(201,184,232,0.6));
+}
+.cert-org {
+  font-size: 13px; color: var(--lavender);
+  letter-spacing: 0.05em; margin-top: 20px;
+}
+
+/* 워드 입력 */
+.word-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; min-height: 60px; }
+.word-tag {
+  background: rgba(107,76,154,0.3);
+  border: 1px solid rgba(201,184,232,0.3);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 13px; color: var(--lavender);
+  animation: fadeUp 0.3s ease;
+}
+
+/* 섹션 헤더 */
+.section-header { margin: 28px 0 16px; }
+.section-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+/* 진행률 */
+.progress-wrap { margin: 16px 0; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+.progress-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; }
+.progress-fill { height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--purple) 0%, var(--lavender) 100%); transition: width 0.6s ease; }
+
+/* 하단 탭바 */
+.tab-bar {
+  position: fixed; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: rgba(20,10,36,0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(201,184,232,0.15);
+  display: flex; z-index: 100;
+}
+.tab-item {
+  flex: 1; padding: 10px 4px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; transition: all 0.2s;
+  border: none; background: none; color: rgba(255,255,255,0.35);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.tab-item.active { color: var(--lavender); }
+.tab-icon { font-size: 20px; }
+.tab-label { font-size: 10px; letter-spacing: 0.03em; }
+
+/* 알림 토스트 */
+.toast {
+  position: fixed; top: 70px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(107,76,154,0.9);
+  border: 1px solid var(--lavender);
+  border-radius: 24px; padding: 10px 20px;
+  font-size: 14px; color: white;
+  z-index: 200; opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.toast.show { opacity: 1; }
+
+/* 보너스 카드 */
+.bonus-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,184,232,0.15);
+  border-radius: 16px; padding: 18px 20px;
+  margin-bottom: 10px; cursor: pointer;
+  transition: all 0.2s; display: flex;
+  align-items: center; gap: 16px;
+}
+.bonus-card:hover { background: rgba(107,76,154,0.15); border-color: rgba(201,184,232,0.4); transform: translateX(4px); }
+.bonus-card.collected { opacity: 0.55; pointer-events: none; }
+.bonus-emoji { font-size: 28px; width: 48px; text-align: center; flex-shrink: 0; }
+.bonus-info { flex: 1; }
+.bonus-title { font-size: 14px; font-weight: 500; color: var(--white); line-height: 1.5; margin-bottom: 3px; }
+.bonus-keyword { font-size: 11px; color: var(--lavender); background: rgba(107,76,154,0.25); border-radius: 10px; padding: 2px 8px; display: inline-block; }
+.bonus-pts { font-size: 13px; font-weight: 500; color: #F0A030; white-space: nowrap; }
+.bonus-done { font-size: 18px; }
+
+.bonus-collect-count {
+  text-align: center; font-size: 36px; font-weight: 700;
+  color: var(--lavender); font-family: 'Noto Serif KR', serif;
+  margin-bottom: 4px;
+}
+.bonus-collect-label {
+  text-align: center; font-size: 13px;
+  color: rgba(255,255,255,0.4); margin-bottom: 16px;
+}
+
+.corner-card.locked { opacity: 0.85; }
+.corner-card.locked:hover { transform: none; background: rgba(255,255,255,0.04); border-color: rgba(201,184,232,0.15); }
+
+/* QR 스캐너 오버레이 */
+#qrOverlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(10,5,20,0.97);
+  flex-direction: column; align-items: center; justify-content: center;
+}
+#qrOverlay.active { display: flex; }
+.qr-scanner-wrap {
+  position: relative; width: 280px; height: 280px;
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 0 0 4px rgba(201,184,232,0.4), 0 0 40px rgba(107,76,154,0.5);
+}
+#qrVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+#qrCanvas { position: fixed; left: -9999px; top: -9999px; }
+.qr-corner {
+  position: absolute; width: 28px; height: 28px;
+  border-color: var(--lavender); border-style: solid;
+  z-index: 2;
+}
+.qr-corner.tl { top: 12px; left: 12px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.qr-corner.tr { top: 12px; right: 12px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+.qr-corner.bl { bottom: 12px; left: 12px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+.qr-corner.br { bottom: 12px; right: 12px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+.qr-scan-line {
+  position: absolute; left: 12px; right: 12px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--lavender), transparent);
+  animation: scanMove 2s linear infinite; z-index: 2;
+}
+@keyframes scanMove {
+  0% { top: 20px; opacity: 1; }
+  90% { top: 248px; opacity: 1; }
+  100% { top: 248px; opacity: 0; }
+}
+.qr-hint {
+  margin-top: 24px; font-size: 15px; color: var(--lavender);
+  text-align: center; line-height: 1.7;
+}
+.qr-hint small { font-size: 12px; color: rgba(255,255,255,0.4); display: block; margin-top: 4px; }
+.qr-close-btn {
+  margin-top: 24px; padding: 12px 32px;
+  border-radius: 24px; border: 1px solid rgba(201,184,232,0.3);
+  background: transparent; color: rgba(255,255,255,0.6);
+  font-size: 14px; cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.qr-close-btn:hover { background: rgba(255,255,255,0.06); }
+.qr-scan-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(107,76,154,0.35);
+  border: 1px solid rgba(201,184,232,0.35);
+  border-radius: 10px; padding: 8px 14px;
+  font-size: 12px; color: var(--lavender);
+  cursor: pointer; margin-top: 10px; width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s; justify-content: center;
+}
+.qr-scan-btn:hover { background: rgba(107,76,154,0.55); }
+.qr-result-ok {
+  text-align: center; padding: 24px 0;
+}
+.qr-result-ok .big-icon { font-size: 56px; margin-bottom: 12px; display: block; }
+.qr-result-ok .ok-title { font-size: 20px; font-weight: 700; color: var(--lavender); margin-bottom: 6px; }
+.qr-result-ok .ok-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+/* 모드 선택 버튼 */
+.mode-btn {
+  flex: 1; padding: 16px 10px;
+  border-radius: 14px; border: 1px solid rgba(201,184,232,0.25);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer; transition: all 0.2s;
+  text-align: center;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.mode-btn.active {
+  background: rgba(107,76,154,0.4);
+  border-color: var(--lavender);
+  color: var(--white);
+}
+.mode-btn:hover { background: rgba(107,76,154,0.25); border-color: rgba(201,184,232,0.5); }
+
+
+.bonus-msg-card {
+  background: rgba(107,76,154,0.15);
+  border: 1px solid rgba(201,184,232,0.25);
+  border-radius: 20px; padding: 32px 24px;
+  text-align: center; margin: 20px 0;
+}
+.bonus-msg-emoji { font-size: 48px; margin-bottom: 16px; display: block; }
+.bonus-msg-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--white); line-height: 1.6;
+  margin-bottom: 20px;
+}
+.bonus-msg-text {
+  font-size: 14px; line-height: 1.9;
+  color: rgba(255,255,255,0.75);
+  text-align: left;
+}
+.reaction-wrap {
+  display: flex; gap: 10px; margin: 24px 0;
+  flex-wrap: wrap; justify-content: center;
+}
+.reaction-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(201,184,232,0.2);
+  border-radius: 24px; padding: 10px 18px;
+  font-size: 14px; cursor: pointer;
+  color: rgba(255,255,255,0.8);
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s;
+}
+.reaction-btn:hover { background: rgba(107,76,154,0.3); border-color: var(--lavender); color: var(--white); }
+.reaction-btn.selected { background: rgba(107,76,154,0.4); border-color: var(--lavender); color: var(--lavender); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- 상단 바 (로그인 후 표시) -->
+<div class="top-bar" id="topBar" style="display:none;">
+  <span class="logo">부천시일쉼지원센터</span>
+  <span class="score-chip" id="topScore">0점</span>
+</div>
+
+<div class="app">
+
+  <!-- ===== 화면 1: 시작 ===== -->
+  <div class="screen active" id="screen-start">
+    <div class="signal-wrap">
+      <div class="signal">
+        <div class="bulb red" id="s-red"></div>
+        <div class="bulb yellow" id="s-yellow"></div>
+        <div class="bulb purple" id="s-purple"></div>
+      </div>
+    </div>
+    <h1 class="title-main">라벤더가 피어난<br>잿빛 도시</h1>
+    <p class="title-sub">일쉼지원센터 4주년 기념 이벤트</p>
+    <p class="desc">사람과 사람 사이의 향기가 사라진 도시.<br>당신의 참여가 꺼진 신호등을 다시 켭니다.</p>
+    <div class="input-wrap">
+      <label class="input-label">닉네임을 입력해 주세요</label>
+      <input class="text-input" id="nicknameInput" type="text" placeholder="예: 보라빛시민" maxlength="10">
+    </div>
+    <!-- 참여 방식 선택 -->
+    <div style="margin:20px 0 12px;">
+      <label class="input-label">참여 방식을 선택해 주세요</label>
+      <div style="display:flex;gap:10px;">
+        <button class="mode-btn active" id="modeOnline" onclick="selectMode('online')">
+          <span style="font-size:22px;display:block;margin-bottom:4px;">💻</span>
+          <span style="font-size:13px;font-weight:500;">온라인 참여</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.5);display:block;margin-top:2px;">어디서든 참여</span>
+        </button>
+        <button class="mode-btn" id="modeOffline" onclick="selectMode('offline')">
+          <span style="font-size:22px;display:block;margin-bottom:4px;">🏢</span>
+          <span style="font-size:13px;font-weight:500;">센터 방문 참여</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.5);display:block;margin-top:2px;">QR 스캔으로 진행</span>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()">도시로 들어가기 →</button>
+  </div>
+
+  <!-- ===== 화면 2: 메인 메뉴 ===== -->
+  <div class="screen" id="screen-menu">
+    <div class="section-header">
+      <div class="section-title" id="menuGreet">안녕하세요 👋</div>
+      <div class="section-sub">총 3개 코너 + 존중시민 테스트에 참여하세요</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>참여 현황</span>
+        <span id="progressText">0 / 4 완료</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="corner-list" id="cornerList"></div>
+    <div class="divider"></div>
+    <div style="background:rgba(107,76,154,0.1);border:1px solid rgba(201,184,232,0.15);border-radius:14px;padding:16px 18px;margin-bottom:12px;cursor:pointer;" onclick="showTab('bonus')">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px;">🌿 보너스 메시지 모으기</div>
+          <div id="bonusMenuStatus" style="font-size:12px;color:rgba(255,255,255,0.45);">기관 곳곳의 포스터 QR을 스캔하세요 · +5점씩</div>
+        </div>
+        <div style="font-size:22px;color:rgba(201,184,232,0.4);">›</div>
+      </div>
+    </div>
+    <button class="btn btn-outline" onclick="showTab('rank')">🏆 실시간 랭킹 보기</button>
+  </div>
+
+  <!-- ===== 화면 3: 동화 퀴즈 ===== -->
+  <div class="screen" id="screen-quiz">
+    <div id="quizContent"></div>
+  </div>
+
+  <!-- ===== 화면 4: 존중시민 테스트 ===== -->
+  <div class="screen" id="screen-survey">
+    <div class="section-header">
+      <div class="section-title">감정노동 존중<br>신호등 테스트</div>
+      <div class="section-sub">최근 3개월간의 나를 돌아봐요</div>
+    </div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.55);line-height:1.8;margin-bottom:20px;">
+      최근 3개월간 고객센터, 매장, 병원, 민원실 등에서<br>
+      고객응대 노동자를 대하며 아래와 같은 행동을 한 적이 있다면 ✓ (O)를 눌러주세요.
+    </p>
+    <div id="surveyItems"></div>
+    <button class="btn btn-primary" id="surveySubmitBtn" onclick="submitSurvey()" style="margin-top:20px;">결과 확인하기</button>
+  </div>
+
+  <!-- ===== 화면 5: 설문 결과 ===== -->
+  <div class="screen" id="screen-result">
+    <div id="resultContent"></div>
+  </div>
+
+  <!-- ===== 화면 6: 랭킹 ===== -->
+  <div class="screen" id="screen-rank">
+    <div class="section-header">
+      <div class="section-title">실시간 랭킹</div>
+      <div class="section-sub">참여자들의 보랏빛 점수</div>
+    </div>
+    <!-- 랭킹 탭 토글 -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button id="rankTabDaily" onclick="switchRankTab('daily')"
+        style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--lavender);background:rgba(107,76,154,0.4);color:var(--lavender);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+        📅 데일리 랭킹
+      </button>
+      <button id="rankTabTotal" onclick="switchRankTab('total')"
+        style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(201,184,232,0.2);background:transparent;color:rgba(255,255,255,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+        🏆 전체 랭킹
+      </button>
+    </div>
+    <div id="rankTabLabel" style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;text-align:center;"></div>
+    <div id="rankList"></div>
+  </div>
+
+  <!-- ===== 화면 7: 완주 임명장 ===== -->
+  <div class="screen" id="screen-cert">
+    <div id="certContent"></div>
+  </div>
+
+  <!-- ===== 화면 8: 보너스 모으기 ===== -->
+  <div class="screen" id="screen-bonus">
+    <div class="section-header">
+      <div class="section-title">🌿 보너스 모으기</div>
+      <div class="section-sub">기관 곳곳의 메시지를 찾아 QR을 스캔하세요</div>
+    </div>
+    <div style="background:rgba(107,76,154,0.12);border:1px solid rgba(201,184,232,0.2);border-radius:14px;padding:16px 18px;margin-bottom:20px;">
+      <div style="font-size:13px;color:var(--lavender);margin-bottom:6px;">📍 이용 방법</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.8;">
+        센터 곳곳에 붙어있는 <strong style="color:var(--lavender);">존중시민 메시지 포스터</strong>를 찾아 QR코드를 스캔하세요.<br>
+        메시지를 읽고 응답하면 <strong style="color:#F0A030;">+5점</strong>씩 적립됩니다.<br>
+        총 4개 모두 찾으면 <strong style="color:#9B7DC8;">+20점</strong>!
+      </div>
+    </div>
+    <div id="bonusProgress" style="margin-bottom:16px;"></div>
+    <div id="bonusList"></div>
+  </div>
+
+  <!-- ===== 화면 9: 보너스 상세 ===== -->
+  <div class="screen" id="screen-bonus-detail">
+    <div id="bonusDetailContent"></div>
+  </div>
+
+  <!-- ===== 화면 10: 존중시민 다짐 ===== -->
+  <div class="screen" id="screen-pledge">
+    <div id="pledgeContent"></div>
+  </div>
+
+</div>
+
+<!-- 하단 탭바 -->
+<nav class="tab-bar" id="tabBar" style="display:none;">
+  <button class="tab-item" onclick="showTab('menu')" id="tab-menu">
+    <span class="tab-icon">🏠</span><span class="tab-label">홈</span>
+  </button>
+  <button class="tab-item" onclick="showTab('bonus')" id="tab-bonus">
+    <span class="tab-icon">🌿</span><span class="tab-label">보너스</span>
+  </button>
+  <button class="tab-item" onclick="showTab('survey')" id="tab-survey">
+    <span class="tab-icon">🚦</span><span class="tab-label">신호등</span>
+  </button>
+  <button class="tab-item" onclick="showTab('rank')" id="tab-rank">
+    <span class="tab-icon">🏆</span><span class="tab-label">랭킹</span>
+  </button>
+  <button class="tab-item" onclick="showTab('cert')" id="tab-cert">
+    <span class="tab-icon">📜</span><span class="tab-label">임명장</span>
+  </button>
+</nav>
+
+<script>
+// ======= QR (URL 파라미터 방식으로 처리) =======
+let qrTargetId = null;
+
+function handleQrResult(url) {
+  // URL에서 파라미터 파싱
+  let params;
+  try {
+    params = new URL(url).searchParams;
+  } catch(e) {
+    params = new URLSearchParams(url.includes('?') ? url.split('?')[1] : '');
+  }
+  const stageParam = params.get('stage');
+  const bonusParam = params.get('bonus');
+
+  if (stageParam) {
+    unlockAndOpenCorner('stage' + stageParam);
+  } else if (bonusParam) {
+    unlockAndOpenBonus(bonusParam);
+  } else {
+    // QR 파라미터가 없을 때 — 현재 스캔 대상 ID로 처리
+    if (qrTargetId && qrTargetId.startsWith('b')) {
+      // 보너스 QR 포스터 스캔 중이었음 → 바로 열기
+      unlockAndOpenBonus(qrTargetId);
+    } else if (qrTargetId && qrTargetId.startsWith('stage')) {
+      // 스테이지 QR 포스터 스캔 중이었음 → 잠금 해제
+      unlockAndOpenCorner(qrTargetId);
+    } else {
+      showQrError('올바른 QR 코드가 아닙니다.\n포스터의 QR을 스캔해 주세요.');
+    }
+  }
+}
+
+function unlockAndOpenCorner(cornerId) {
+  // 잠금 해제
+  if (state.offlineLocked) delete state.offlineLocked[cornerId];
+  renderCornerList();
+  showToast('🔓 잠금 해제!');
+  setTimeout(() => openCorner(cornerId), 400);
+}
+
+function unlockAndOpenBonus(bonusId) {
+  showToast('🌿 보너스 메시지 발견!');
+  setTimeout(() => {
+    showTab('bonus');
+    setTimeout(() => openBonus(bonusId), 300);
+  }, 400);
+}
+
+function showQrError(msg) {
+  showToast(msg);
+}
+
+// ======= 구글 시트 연동 =======
+const API_URL = 'https://script.google.com/macros/s/AKfycbxlTSD6zF-GMDAN9MifGYJz-kF2yLFQvBFTTe0qJtu8HLCpUrfDcMp6nTRydW8IHmLK/exec';
+
+async function apiGet(params) {
+  try {
+    const query = new URLSearchParams(params).toString();
+    const res = await fetch(`${API_URL}?${query}`);
+    return await res.json();
+  } catch(e) { console.log('API GET 오류:', e); return null; }
+}
+
+async function apiPost(data) {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    return await res.json();
+  } catch(e) { console.log('API POST 오류:', e); return null; }
+}
+
+// ======= 보너스 데이터 =======
+const BONUS_ITEMS = [
+  {
+    id: 'b1', emoji: '🗣️', title: '존댓말은 기본, 정중함은 품격',
+    message: '• 따뜻한 인사와 존댓말로 서로를 존중해요.\n• "고맙습니다!"라는 감사 표현을 잊지 않아요.',
+    keyword: '정중함'
+  },
+  {
+    id: 'b2', emoji: '💬', title: '중요한 내용만 명확하게',
+    message: '• 감정적인 하소연·화풀이 대신, 핵심을 말해요.\n• 상대방이 이해하기 쉽게, 차분하고 명확하게 전달해요.',
+    keyword: '명확함'
+  },
+  {
+    id: 'b3', emoji: '👁️', title: '시선은 따뜻하게, 대화는 동등하게',
+    message: '• 외모, 말투 등으로 상대를 판단하거나 무시하지 않고, 전문성과 인격을 존중해요.\n• 경청으로 소통의 예절을 지켜요.\n• 사적인 요구나 특별 대우를 요구하지 않아요.',
+    keyword: '존중'
+  },
+  {
+    id: 'b4', emoji: '⚖️', title: '민원은 이성적으로, 해결은 합리적으로',
+    message: '• 작은 실수를 탓하기보다 문제 해결에 집중해요.\n• 정해진 규정을 존중하며, 무리한 억지 요구를 하지 않아요.\n• 순간의 감정으로 보복성 민원, 악의적 후기를 남기지 않아요.',
+    keyword: '합리적'
+  },
+];
+
+// ======= 데이터 =======
+const CORNERS = [
+  {
+    id: 'stage1', icon: '🌾', name: '허수아비의 교차로', stage: 'Stage 1',
+    pts: 30, reward: '지혜로운 눈',
+    tale: `머리에 짚단이 잔뜩 헝클어진 <strong>허수아비</strong>가 창구를 향해 소리치고 있었습니다.<br><br>"왜 내 서류만 안 나오는 거야!"<br><br>화를 낼수록 짚단 사이로 뜨겁고 건조한 바람이 새어 나왔습니다. 창구 안 직원은 고개를 숙인 채 "죄송합니다"를 반복했습니다. 주변 사람들은 시선을 피했습니다.<br><br>조향사는 아무 말 없이 허수아비의 거친 손에 라벤더 가지 하나를 쥐여 주었습니다. 코끝에 번지는 깊고 차분한 보라빛 향기. 씩씩거리던 숨이 천천히 가라앉았습니다. 뜨겁던 시야가 식자, 그제야 창구 너머 직원의 굽은 등허리가 보였습니다.`,
+    question: '대기 시간이 길어질 때, 허수아비의 가쁜 숨을 가라앉히고 직원의 수고를 바라보게 하는 지혜로운 시민의 태도는 무엇일까요?',
+    options: [
+      '큰 소리로 항의하며 책임자를 불러 빠른 처리를 요구한다',
+      '내 차례가 빨리 오도록 창구 직원에게 계속 재촉한다',
+      '노동자가 내 업무를 처리하기 위해 집중하고 있음을 믿고 기다린다'
+    ],
+    answer: 2
+  },
+  {
+    id: 'stage2', icon: '⚙️', name: '양철인간의 상점', stage: 'Stage 2',
+    pts: 30, reward: '다정한 마음',
+    tale: `계산대 앞에 <strong>양철 인간</strong>이 서 있었습니다.<br><br>끝없이 쏟아지는 날 선 말들 앞에서도 그는 입꼬리가 고정된 채 "사랑합니다, 고객님", "감사합니다, 고객님"이라는 말만 앵무새처럼 반복했습니다.<br><br>진짜 감정을 숨긴 그의 가슴은 무거운 자물쇠로 굳게 잠겨 있었습니다.<br><br>조향사는 계산대 위에 라벤더를 살며시 올려두었습니다. 양철 인간의 텅 빈 두 눈을 가만히 응시하며, 낮고 따뜻한 목소리로 말했습니다.<br><br>"오늘 하루, 정말 고단하셨죠. 고맙습니다."<br><br><em>찰칵.</em> 무거운 자물쇠가 열렸습니다.`,
+    question: '억지 미소 뒤 노동자의 고단함을 알아주고, 굳게 잠긴 자물쇠를 여는 진심 어린 한마디는?',
+    options: [
+      '"왜 이렇게 표정이 없어요? 좀 더 밝게 웃어주세요"',
+      '"매뉴얼대로만 하지 말고 융통성 있게 해주세요"',
+      '"오늘 하루, 정말 고단하셨죠. 고맙습니다"'
+    ],
+    answer: 2
+  },
+  {
+    id: 'stage3', icon: '🦁', name: '겁쟁이 사자의 거리', stage: 'Stage 3',
+    pts: 30, reward: '먼저 다가가는 용기',
+    tale: `상점 뒤편, 덩치 큰 <strong>사자</strong>가 몸을 웅크린 채 떨고 있었습니다.<br><br>누군가 직원을 향해 얼음송곳 같은 말을 던지고 있었습니다. 돕고 싶었지만, 겁을 먹고 숨은 자신이 부끄러운 사자였습니다.<br><br>조향사가 사자의 곁을 스쳐 지나가며 라벤더 가지를 툭 떨어뜨렸습니다. 짙은 향기가 사자의 차가운 콧등을 감쌌습니다.<br><br>사자는 천천히 몸을 일으켰습니다. 고함치는 사람을 지나쳐 직원에게 걸어갔습니다. 상점 안을 가득 채웠던 뾰족한 말들이 봄눈처럼 스르르 녹아내렸습니다.`,
+    question: '뾰족한 고함이 가득한 상점 안을 봄눈처럼 녹아내리게 할 사자의 가장 크고 부드러운 한마디는?',
+    options: [
+      '"저도 불만이 있는데 다들 왜 이렇게 유난이에요"',
+      '못 본 척 고개를 돌리고 자리를 피한다',
+      '"당신 잘못이 아니에요. 너무 속상해 마세요. 감사합니다"'
+    ],
+    answer: 2
+  }
+];
+
+const SURVEY_ITEMS = [
+  { q: '고객응대 노동자에게 반말이나 짜증 섞인 말투를 쓴 적이 있다.' },
+  { q: '불만을 표현하면서 욕설이나 인신공격을 한 적이 있다.', sub: '"그렇게 일해서 돈 벌고 싶냐?", "머리가 나쁘냐?" 등' },
+  { q: '안내받은 정책이나 규정을 무시하고 억지 요구를 한 적이 있다.', sub: '"원래 다 해줬다", "다른 곳은 된다"' },
+  { q: '상대방의 설명을 듣지 않고 일방적으로 대화를 끊거나 무시한 적이 있다.' },
+  { q: '외모, 말투, 나이, 직업 등을 근거로 상대방을 평가하거나 무시한 적이 있다.', sub: '"어려 보여서 뭘 모르네", "말투가 왜 그러냐"' },
+  { q: '개인적인 감정을 풀기 위해 장시간 하소연 또는 화풀이한 적이 있다.' },
+  { q: '요청이 정당하게 거절되었는데도 보복성 민원을 제기한 적이 있다.' },
+  { q: '작은 실수나 말투를 문제 삼아 악의적인 후기를 남긴 적이 있다.' },
+  { q: '과도한 친절이나 사적인 관심을 요구한 적이 있다.' },
+  { q: '응대 후 감사나 인사 없이 불쾌한 태도로 마무리한 적이 있다.' }
+];
+
+const RESULTS = [
+  { min: 0, max: 0, color: '#9B7DC8', label: '존중의 보라등', title: '존중의 보라등 🟣',
+    desc: '감정노동자를 동료시민으로 존중하는 성숙한 시민 의식을 갖춘 신호입니다. 감정노동 존중을 당연한 가치로 실천하는 <strong>존중시민</strong>입니다.' },
+  { min: 1, max: 3, color: '#F0A030', label: '성찰의 노란등', title: '성찰의 노란등 🟡',
+    desc: '대부분의 상황에서 존중 시민이지만, 의도치 않게 감정노동자에게 부정적 감정노동을 유발할 수 있다는 주의 신호입니다. 자신의 행동이 미칠 영향을 <strong>\'잠시 멈춤\'</strong>하고 살펴보세요.' },
+  { min: 4, max: 6, color: '#E84040', label: '멈춤의 빨간등', title: '멈춤의 빨간등 🔴',
+    desc: '감정노동자에게 상당한 정신적 스트레스를 유발한다는 명백한 위험 신호입니다. 자신의 행동이 \'갑질\'일 수 있음을 인지하고 <strong>\'바로 멈춤\'</strong>과 적극적 개선이 필요합니다.' },
+  { min: 7, max: 10, color: '#888', label: '고장 난 신호등', title: '고장 난 신호등 ⚫',
+    desc: '인식체계가 고장 난 상태입니다. 감정노동자의 인격을 파괴하고 노동환경을 심각하게 위협하는 수준입니다. 전문가의 도움이나 교육을 통해 신호 체계를 근본적으로 점검해야 합니다.' }
+];
+
+// ======= 상태 =======
+let state = {
+  nickname: '',       // 표시용 (예: 생뚱)
+  nicknameWithDate: '',  // 저장용 (예: 생뚱 14)
+  score: 0,
+  mode: 'online',     // 'online' | 'offline'
+  done: {},
+  currentCorner: null,
+  surveyAnswers: Array(10).fill(null),
+  surveyDone: false,
+  wordInput: '',
+  certIssued: false,
+  bonusCollected: {}
+};
+
+let currentRankTab = 'daily'; // 'daily' | 'total'
+
+// 가상 랭킹 데이터
+let rankings = [
+  { name: '보라빛수호자', score: 110 },
+  { name: '라벤더향기', score: 90 },
+  { name: '따뜻한시선', score: 80 },
+  { name: '친절한하루', score: 60 },
+];
+
+// ======= 모드 선택 =======
+function selectMode(mode) {
+  state.mode = mode;
+  document.getElementById('modeOnline').className = 'mode-btn' + (mode === 'online' ? ' active' : '');
+  document.getElementById('modeOffline').className = 'mode-btn' + (mode === 'offline' ? ' active' : '');
+}
+
+// ======= 유틸 =======
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function addScore(pts, type, id) {
+  state.score += pts;
+  document.getElementById('topScore').textContent = state.score + '점';
+  updateRankings();
+
+  // 구글 시트에 점수 저장 (날짜 포함 닉네임으로)
+  if (state.nicknameWithDate) {
+    apiPost({
+      action: 'submitScore',
+      nickname: state.nicknameWithDate,
+      baseName: state.nickname,
+      type: type || 'etc',
+      id: id || '',
+      pts: pts,
+      totalScore: state.score,
+      mode: state.mode,
+      date: new Date().getDate()
+    });
+  }
+
+  // 보너스 메뉴 상태 업데이트
+  const el = document.getElementById('bonusMenuStatus');
+  if (el) {
+    const cnt = Object.keys(state.bonusCollected).length;
+    el.textContent = cnt > 0
+      ? `${cnt} / ${BONUS_ITEMS.length}개 수집 완료 · +${cnt*5}점 획득`
+      : '기관 곳곳의 포스터 QR을 스캔하세요 · +5점씩';
+  }
+}
+
+function updateRankings() {
+  const me = rankings.find(r => r.name === state.nicknameWithDate);
+  if (me) me.score = state.score;
+  else if (state.nicknameWithDate) rankings.push({ name: state.nicknameWithDate, baseName: state.nickname, score: state.score, date: new Date().getDate() });
+  rankings.sort((a, b) => b.score - a.score);
+}
+
+function updateProgress() {
+  const total = 4;
+  const done = Object.keys(state.done).length + (state.surveyDone ? 0 : 0);
+  const cnt = Object.keys(state.done).length + (state.surveyDone ? 1 : 0);
+  const pct = Math.round(cnt / total * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = cnt + ' / ' + total + ' 완료';
+  renderCornerList();
+  if (cnt === total && !state.certIssued) {
+    addScore(20, 'complete', 'complete');
+    state.certIssued = true;
+    showToast('🎉 완주! 보너스 +20점 획득!');
+    setTimeout(() => showPledge(), 1500);
+  }
+}
+
+// ======= 탭 전환 =======
+function animateSignal() {
+  setTimeout(() => document.getElementById('s-red').classList.add('on'), 300);
+  setTimeout(() => document.getElementById('s-yellow').classList.add('on'), 800);
+  setTimeout(() => document.getElementById('s-purple').classList.add('on'), 1400);
+}
+function showTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  const tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) tabEl.classList.add('active');
+  if (tab === 'rank') loadRankingFromSheet();
+  if (tab === 'cert') renderCert();
+  if (tab === 'bonus') renderBonus();
+  window.scrollTo(0, 0);
+}
+
+// ======= 코너 목록 =======
+function renderCornerList() {
+  const el = document.getElementById('cornerList');
+  let html = '';
+  CORNERS.forEach(c => {
+    const done = state.done[c.id];
+    const locked = state.mode === 'offline' && state.offlineLocked && state.offlineLocked[c.id];
+    if (locked) {
+      html += `<div class="corner-card locked" style="cursor:default;">
+        <div class="corner-icon">🔒</div>
+        <div class="corner-info">
+          <div class="corner-name">${c.stage} — ${c.name}</div>
+          <div class="corner-desc" style="color:var(--lavender);">📱 포스터 QR을 폰 카메라로 스캔하세요</div>
+        </div>
+        <div><div class="corner-pts" style="font-size:11px;color:rgba(255,255,255,0.4);">잠김</div></div>
+      </div>`;
+    } else {
+      html += `<div class="corner-card ${done ? 'done' : ''}"
+        onclick="${done ? '' : 'openCorner(\'' + c.id + '\')'}">
+        <div class="corner-icon">${c.icon}</div>
+        <div class="corner-info">
+          <div class="corner-name">${c.stage} — ${c.name}</div>
+          <div class="corner-desc">${done ? '✓ 완료 · ' + c.reward + ' 획득' : '동화를 읽고 퀴즈를 풀어보세요'}</div>
+        </div>
+        <div>
+          <div class="corner-pts">${done ? '✓' : '+' + c.pts + '점'}</div>
+        </div>
+      </div>`;
+    }
+  });
+  const surveyDone = state.surveyDone;
+  html += `<div class="corner-card ${surveyDone ? 'done' : ''}" onclick="${surveyDone ? '' : 'showTab(\'survey\')'}">
+    <div class="corner-icon">🚦</div>
+    <div class="corner-info">
+      <div class="corner-name">존중시민 신호등 테스트</div>
+      <div class="corner-desc">${surveyDone ? '✓ 완료 · 결과 확인됨' : '나의 존중 신호등은 어떤 색일까요?'}</div>
+    </div>
+    <div><div class="corner-pts">${surveyDone ? '✓' : '최대 50점'}</div></div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ======= 퀴즈 =======
+function openCorner(id) {
+  state.currentCorner = id;
+  const c = CORNERS.find(x => x.id === id);
+  const el = document.getElementById('quizContent');
+  el.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px;" onclick="showTab('menu')">← 돌아가기</button>
+    </div>
+    <div class="tale-card">
+      <div class="tale-label">📖 동화 — ${c.stage}</div>
+      <div class="tale-text">${c.tale}</div>
+    </div>
+    <div class="quiz-question">${c.question}</div>
+    <div class="options" id="optionsList">
+      ${c.options.map((o, i) => `<button class="option-btn" onclick="selectOption(${i})">${o}</button>`).join('')}
+    </div>
+    <div id="quizFeedback"></div>`;
+  showTab('quiz');
+}
+
+function selectOption(idx) {
+  const c = CORNERS.find(x => x.id === state.currentCorner);
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+  const correct = idx === c.answer;
+  btns[idx].classList.add(correct ? 'correct' : 'wrong');
+  if (!correct) btns[c.answer].classList.add('correct');
+
+  const fb = document.getElementById('quizFeedback');
+  if (correct) {
+    if (!state.done[c.id]) {
+      addScore(c.pts, c.id, c.id);
+      state.done[c.id] = true;
+      updateProgress();
+    }
+    fb.innerHTML = `<div class="feedback-card correct">
+      <div class="feedback-icon">✨</div>
+      <div class="feedback-title">정답입니다!</div>
+      <div class="feedback-reward">🌿 ${c.reward} 획득 · +${c.pts}점</div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:12px;" onclick="showTab('menu')">메뉴로 돌아가기</button>`;
+  } else {
+    // 오답 -5점
+    addScore(-5, 'wrong', c.id);
+    showToast('❌ 오답 -5점');
+    fb.innerHTML = `<div class="feedback-card wrong">
+      <div class="feedback-icon">💨</div>
+      <div class="feedback-title">아쉬워요 (-5점)</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:6px;">정답을 확인하고 다시 도전해보세요</div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:12px;" onclick="openCorner('${c.id}')">다시 도전하기</button>
+    <button class="btn btn-primary" style="margin-top:8px;" onclick="showTab('menu')">메뉴로 돌아가기</button>`;
+  }
+}
+
+// ======= 설문 =======
+function renderSurvey() {
+  const el = document.getElementById('surveyItems');
+  let html = '';
+  SURVEY_ITEMS.forEach((item, i) => {
+    html += `<div class="ox-question">
+      <div class="ox-q-num">문항 ${i + 1}</div>
+      <div class="ox-q-text">${item.q}</div>
+      ${item.sub ? `<div class="ox-q-sub">${item.sub}</div>` : ''}
+      <div class="ox-btns">
+        <button class="ox-btn" id="o-btn-${i}" onclick="setOX(${i}, true)">O</button>
+        <button class="ox-btn" id="x-btn-${i}" onclick="setOX(${i}, false)">X</button>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function setOX(idx, isO) {
+  state.surveyAnswers[idx] = isO;
+  document.getElementById('o-btn-' + idx).className = 'ox-btn' + (isO ? ' selected-o' : '');
+  document.getElementById('x-btn-' + idx).className = 'ox-btn' + (!isO ? ' selected-x' : '');
+}
+
+function submitSurvey() {
+  const unanswered = state.surveyAnswers.findIndex(a => a === null);
+  if (unanswered >= 0) { showToast(`문항 ${unanswered + 1}번을 응답해 주세요`); return; }
+  const yesCount = state.surveyAnswers.filter(a => a === true).length;
+  const result = RESULTS.find(r => yesCount >= r.min && yesCount <= r.max);
+
+  // 점수 계산: 기본 10점 + X 응답마다 +10점, O 응답마다 0점
+  // → 즉 10점 * (아니오 개수) 방식 아니라:
+  // 아니오 10개 = 50점 (최고), 예 1개 추가마다 -5점
+  // 공식: max(0, 50 - yesCount * 5)
+  const surveyScore = Math.max(0, 50 - yesCount * 5);
+
+  if (!state.surveyDone) {
+    addScore(surveyScore, 'survey', 'survey');
+    state.surveyDone = true;
+    updateProgress();
+  }
+  const el = document.getElementById('resultContent');
+  el.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px;" onclick="showTab('survey')">← 다시보기</button>
+    </div>
+    <div class="count-badge">${yesCount}개</div>
+    <div style="text-align:center;margin-bottom:8px;">
+      <div style="width:72px;height:72px;border-radius:50%;background:${result.color};box-shadow:0 0 24px ${result.color};margin:0 auto 12px;"></div>
+    </div>
+    <div class="result-title" style="color:${result.color}">${result.title}</div>
+    <div class="result-label">${result.label}</div>
+    <div style="text-align:center;margin:12px 0;">
+      <span style="background:rgba(107,76,154,0.3);border:1px solid var(--lavender);border-radius:20px;padding:6px 16px;font-size:14px;color:var(--lavender);">
+        신호등 점수 +${surveyScore}점
+      </span>
+    </div>
+    <div class="result-desc">${result.desc}</div>
+    <div style="margin-top:20px;">
+      <button class="btn btn-primary" onclick="showPledge()">다음 →</button>
+    </div>`;
+  showTab('result');
+}
+
+// ======= 존중시민 다짐 =======
+function showPledge() {
+  const el = document.getElementById('pledgeContent');
+  el.innerHTML = `
+    <div style="text-align:center;padding:40px 0 24px;">
+      <div style="font-size:56px;margin-bottom:20px;">🌿</div>
+      <div style="font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--white);line-height:1.6;margin-bottom:12px;">
+        이제 존중시민이<br>되어주시겠어요?
+      </div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.9;margin-bottom:32px;">
+        감정노동자의 수고를 알아보고<br>
+        따뜻한 말 한마디를 건네는<br>
+        <strong style="color:var(--lavender);">존중시민</strong>으로서의 다짐입니다.
+      </div>
+    </div>
+
+    <div style="background:rgba(107,76,154,0.15);border:1px solid rgba(201,184,232,0.25);border-radius:20px;padding:28px 24px;margin-bottom:28px;">
+      <div style="font-family:'Noto Serif KR',serif;font-size:16px;color:var(--white);line-height:2;text-align:center;">
+        나는 감정노동자를 동료 시민으로 존중하고,<br>
+        따뜻한 말과 배려 있는 행동으로<br>
+        보랏빛 신호등을 켜는<br>
+        <strong style="color:var(--lavender);">존중시민</strong>이 되겠습니다.
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="font-size:17px;padding:18px;" onclick="acceptPledge()">
+      네, 존중시민이 되겠습니다 💜
+    </button>
+    <button class="btn btn-outline" style="margin-top:10px;" onclick="showTab('menu')">
+      나중에 할게요
+    </button>`;
+  showTab('pledge');
+}
+
+function acceptPledge() {
+  showToast('💜 존중시민으로 임명됩니다!');
+  setTimeout(() => showTab('cert'), 800);
+}
+
+// ======= 보너스 =======
+function renderBonus() {
+  const collected = Object.keys(state.bonusCollected).length;
+  // 진행률
+  document.getElementById('bonusProgress').innerHTML = `
+    <div class="bonus-collect-count">${collected} / ${BONUS_ITEMS.length}</div>
+    <div class="bonus-collect-label">개 수집 완료 · +${collected * 5}점 획득</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(collected/BONUS_ITEMS.length*100)}%"></div></div>`;
+
+  // 목록
+  let html = '';
+  BONUS_ITEMS.forEach(b => {
+    const done = state.bonusCollected[b.id];
+    const isOffline = state.mode === 'offline';
+
+    if (!done && isOffline) {
+      html += `<div class="bonus-card" style="cursor:default;">
+        <div class="bonus-emoji">🔒</div>
+        <div class="bonus-info">
+          <div class="bonus-title">${b.title}</div>
+          <span class="bonus-keyword"># ${b.keyword}</span>
+          <div style="font-size:11px;color:var(--lavender);margin-top:6px;">📱 포스터 QR을 폰 카메라로 스캔하세요</div>
+        </div>
+        <div class="bonus-pts">+5점</div>
+      </div>`;
+    } else {
+      // 온라인이거나 수집 완료
+      html += `<div class="bonus-card ${done ? 'collected' : ''}" onclick="${done ? '' : 'openBonus(\'' + b.id + '\')'}">
+        <div class="bonus-emoji">${b.emoji}</div>
+        <div class="bonus-info">
+          <div class="bonus-title">${b.title}</div>
+          <span class="bonus-keyword"># ${b.keyword}</span>
+        </div>
+        <div>
+          ${done
+            ? '<div class="bonus-done">✅</div>'
+            : '<div class="bonus-pts">+5점</div>'}
+        </div>
+      </div>`;
+    }
+  });
+  document.getElementById('bonusList').innerHTML = html;
+}
+
+function openBonus(id) {
+  const b = BONUS_ITEMS.find(x => x.id === id);
+  if (!b || state.bonusCollected[id]) return;
+  const el = document.getElementById('bonusDetailContent');
+  el.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:13px;" onclick="showTab('bonus')">← 보너스 목록</button>
+    </div>
+    <div class="bonus-msg-card">
+      <span class="bonus-msg-emoji">${b.emoji}</span>
+      <div class="bonus-msg-title">${b.title}</div>
+      <div class="bonus-msg-text">${b.message.replace(/\n/g, '<br>')}</div>
+    </div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.7);text-align:center;margin:16px 0 8px;">
+      이 메시지를 읽고 어떤 느낌이 드셨나요?
+    </div>
+    <div class="reaction-wrap" id="reactionWrap">
+      <button class="reaction-btn" onclick="selectReaction(this, '${id}')">💜 공감돼요</button>
+      <button class="reaction-btn" onclick="selectReaction(this, '${id}')">🌿 실천해볼게요</button>
+      <button class="reaction-btn" onclick="selectReaction(this, '${id}')">✨ 몰랐던 사실이에요</button>
+      <button class="reaction-btn" onclick="selectReaction(this, '${id}')">🦁 용기가 생겼어요</button>
+    </div>
+    <div id="bonusSubmitArea" style="margin-top:16px;"></div>`;
+  showTab('bonus-detail');
+}
+
+function selectReaction(btn, bonusId) {
+  document.querySelectorAll('.reaction-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('bonusSubmitArea').innerHTML = `
+    <button class="btn btn-primary" onclick="collectBonus('${bonusId}')">+5점 받기 →</button>`;
+}
+
+function collectBonus(id) {
+  if (state.bonusCollected[id]) return;
+  state.bonusCollected[id] = true;
+  addScore(5, 'bonus', id);
+  const collected = Object.keys(state.bonusCollected).length;
+  showToast(`🌿 보너스 +5점! (${collected}/${BONUS_ITEMS.length}개 수집)`);
+
+  // 전부 모았을 때 보너스
+  if (collected === BONUS_ITEMS.length) {
+    setTimeout(() => showToast('🎉 4개 완수! 존중시민 메시지 완성!'), 800);
+  }
+
+  const el = document.getElementById('bonusDetailContent');
+  el.innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <div style="font-size:56px;margin-bottom:16px;">✅</div>
+      <div style="font-size:20px;font-weight:700;color:var(--lavender);margin-bottom:8px;">+5점 획득!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.6);margin-bottom:24px;">
+        ${collected}번째 메시지 수집 완료<br>
+        총 ${Object.keys(state.bonusCollected).length * 5}점 보너스 획득
+      </div>
+      <button class="btn btn-primary" onclick="showTab('bonus')">더 찾으러 가기 →</button>
+      <button class="btn btn-outline" style="margin-top:10px;" onclick="showTab('menu')">홈으로</button>
+    </div>`;
+  renderBonus();
+}
+
+// ======= 랭킹 =======
+function switchRankTab(tab) {
+  currentRankTab = tab;
+  const btnDaily = document.getElementById('rankTabDaily');
+  const btnTotal = document.getElementById('rankTabTotal');
+  if (tab === 'daily') {
+    btnDaily.style.background = 'rgba(107,76,154,0.4)';
+    btnDaily.style.borderColor = 'var(--lavender)';
+    btnDaily.style.color = 'var(--lavender)';
+    btnTotal.style.background = 'transparent';
+    btnTotal.style.borderColor = 'rgba(201,184,232,0.2)';
+    btnTotal.style.color = 'rgba(255,255,255,0.4)';
+  } else {
+    btnTotal.style.background = 'rgba(107,76,154,0.4)';
+    btnTotal.style.borderColor = 'var(--lavender)';
+    btnTotal.style.color = 'var(--lavender)';
+    btnDaily.style.background = 'transparent';
+    btnDaily.style.borderColor = 'rgba(201,184,232,0.2)';
+    btnDaily.style.color = 'rgba(255,255,255,0.4)';
+  }
+  renderRanking();
+}
+
+async function loadRankingFromSheet() {
+  const today = new Date().getDate();
+  const data = await apiGet({ action: 'getRanking', today: today });
+  if (data && Array.isArray(data)) {
+    rankings = data.map(r => ({
+      name: r.name,
+      baseName: r.baseName || r.name.replace(/ \d+$/, ''),
+      score: r.score,
+      date: r.date || today
+    }));
+    const me = rankings.find(r => r.name === state.nicknameWithDate);
+    if (me) me.score = state.score;
+    else if (state.nicknameWithDate) rankings.push({ name: state.nicknameWithDate, baseName: state.nickname, score: state.score, date: today });
+    rankings.sort((a, b) => b.score - a.score);
+    renderRanking();
+  }
+}
+
+function renderRanking() {
+  updateRankings();
+  const el = document.getElementById('rankList');
+  const today = new Date().getDate();
+  const labelEl = document.getElementById('rankTabLabel');
+
+  let list;
+  if (currentRankTab === 'daily') {
+    // 데일리: 오늘 날짜 항목만
+    list = rankings.filter(r => r.date === today || r.name.endsWith(' ' + today));
+    if (labelEl) labelEl.textContent = `📅 ${today}일 참여자 랭킹`;
+  } else {
+    // 전체: baseName 기준으로 점수 합산
+    const totals = {};
+    rankings.forEach(r => {
+      const base = r.baseName || r.name.replace(/ \d+$/, '');
+      if (!totals[base]) totals[base] = 0;
+      totals[base] += r.score;
+    });
+    list = Object.entries(totals).map(([name, score]) => ({ name, score }));
+    list.sort((a, b) => b.score - a.score);
+    if (labelEl) labelEl.textContent = '🏆 누적 점수 합산 랭킹';
+  }
+
+  const max = list[0]?.score || 1;
+  const icons = ['🥇', '🥈', '🥉'];
+  const cls = ['gold', 'silver', 'bronze'];
+  let html = '';
+
+  if (list.length === 0) {
+    html = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4);font-size:14px;">아직 참여자가 없습니다</div>';
+  } else {
+    list.slice(0, 20).forEach((r, i) => {
+      const isMe = currentRankTab === 'daily'
+        ? r.name === state.nicknameWithDate
+        : r.name === state.nickname;
+      const pct = Math.round(r.score / max * 100);
+      html += `<div class="rank-item ${isMe ? 'me' : ''}">
+        <div class="rank-no ${i < 3 ? cls[i] : 'normal'}">${i < 3 ? icons[i] : i + 1}</div>
+        <div style="flex:1">
+          <div class="rank-name">${r.name}${isMe ? ' (나)' : ''}</div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%"></div></div>
+        </div>
+        <div class="rank-pts">${r.score}점</div>
+      </div>`;
+    });
+  }
+  el.innerHTML = html;
+}
+
+// ======= 임명장 =======
+function renderCert() {
+  const el = document.getElementById('certContent');
+  const allDone = Object.keys(state.done).length >= 3 && state.surveyDone;
+  if (!allDone) {
+    el.innerHTML = `<div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+      <div style="font-size:17px;font-weight:500;margin-bottom:8px;">아직 완주하지 않았어요</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;">3개 코너 + 신호등 테스트를 모두 완료하면<br>임명장이 발급됩니다</div>
+      <button class="btn btn-primary" onclick="showTab('menu')">코너 참여하러 가기</button>
+    </div>`;
+    return;
+  }
+  const today = new Date();
+  const dateStr = today.getFullYear() + '년 ' + (today.getMonth()+1) + '월 ' + today.getDate() + '일';
+  el.innerHTML = `
+    <div class="cert-wrap">
+      <div class="cert-title">— 존중시민 임명장 —</div>
+      <div class="cert-seal">🌿</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:4px;">이 증서는</div>
+      <div class="cert-name">${state.nickname}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin:4px 0 16px;">에게 수여됩니다</div>
+      <div class="cert-sub">
+        감정노동자의 수고를 알아보고<br>
+        잿빛 도시에 보랏빛 향기를 불어넣은<br>
+        <strong style="color:var(--lavender);">존중시민</strong>으로 임명합니다
+      </div>
+      <div style="display:flex;justify-content:center;gap:8px;margin:16px 0;flex-wrap:wrap;">
+        <span style="background:rgba(107,76,154,0.3);border:1px solid var(--lavender);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--lavender);">🌾 지혜로운 눈</span>
+        <span style="background:rgba(107,76,154,0.3);border:1px solid var(--lavender);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--lavender);">💛 다정한 마음</span>
+        <span style="background:rgba(107,76,154,0.3);border:1px solid var(--lavender);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--lavender);">🦁 용기</span>
+      </div>
+      <div class="cert-org">일쉼지원센터 4주년 · ${dateStr}</div>
+    </div>
+    <div style="font-size:12px;text-align:center;color:rgba(255,255,255,0.3);margin-top:12px;">화면을 캡처해서 간직하세요 📸</div>
+    <button class="btn btn-outline" style="margin-top:16px;" onclick="showTab('menu')">처음으로 돌아가기</button>`;
+}
+
+// ======= URL 파라미터 처리 =======
+function handleURLParams() {
+  const params = new URLSearchParams(window.location.search);
+  const bonusId = params.get('bonus');
+  const stageId = params.get('stage');
+
+  if (bonusId || stageId) {
+    const saved = sessionStorage.getItem('ilshim_nickname');
+    const savedMode = sessionStorage.getItem('ilshim_mode') || 'online';
+    if (saved) {
+      const today = new Date().getDate();
+      state.nickname = saved;
+      state.nicknameWithDate = saved + ' ' + today;
+      state.mode = savedMode;
+      document.getElementById('menuGreet').textContent = saved + '님, 환영합니다 👋';
+      document.getElementById('topBar').style.display = 'flex';
+      document.getElementById('tabBar').style.display = 'flex';
+
+      if (state.mode === 'offline') {
+        state.offlineLocked = { stage1: true, stage2: true, stage3: true };
+      }
+
+      renderCornerList();
+      renderSurvey();
+      updateRankings();
+
+      if (bonusId) {
+        showTab('menu');
+        setTimeout(() => openBonus(bonusId), 300);
+      } else if (stageId) {
+        const corner = CORNERS.find(c => c.id === 'stage' + stageId);
+        if (corner) {
+          // QR 스캔 → 오프라인 잠금 해제
+          if (state.offlineLocked) delete state.offlineLocked['stage' + stageId];
+          showTab('menu');
+          setTimeout(() => openCorner('stage' + stageId), 300);
+        }
+      }
+    } else {
+      if (bonusId) sessionStorage.setItem('ilshim_pending', 'bonus:' + bonusId);
+      if (stageId) sessionStorage.setItem('ilshim_pending', 'stage:stage' + stageId);
+    }
+  }
+}
+
+// startGame에 세션 저장 및 pending 처리 추가
+const _origStart = window.startGame;
+function startGame() {
+  const name = document.getElementById('nicknameInput').value.trim();
+  if (!name) { showToast('닉네임을 입력해 주세요'); return; }
+  const today = new Date().getDate();
+  state.nickname = name;
+  state.nicknameWithDate = name + ' ' + today;
+
+  sessionStorage.setItem('ilshim_nickname', name);
+  sessionStorage.setItem('ilshim_mode', state.mode);
+
+  document.getElementById('menuGreet').textContent = name + '님, 환영합니다 👋';
+  // 모드 배지 표시
+  const modeBadge = state.mode === 'online' ? '💻 온라인' : '🏢 센터 방문';
+  document.getElementById('topBar').style.display = 'flex';
+  document.getElementById('tabBar').style.display = 'flex';
+
+  // 오프라인 모드: 코너 잠금 (QR 스캔으로만 해제)
+  if (state.mode === 'offline') {
+    state.offlineLocked = { stage1: true, stage2: true, stage3: true };
+  }
+
+  renderCornerList();
+  renderSurvey();
+  animateSignal();
+
+  // 구글 시트에 참여자 등록
+  apiPost({ action: 'register', nickname: state.nicknameWithDate, baseName: state.nickname, mode: state.mode }).then(() => {
+    apiGet({ action: 'getMyScore', nickname: state.nicknameWithDate }).then(data => {
+      if (data && data.score > 0) {
+        state.score = data.score;
+        if (data.stage1) state.done['stage1'] = true;
+        if (data.stage2) state.done['stage2'] = true;
+        if (data.stage3) state.done['stage3'] = true;
+        if (data.survey) state.surveyDone = true;
+        document.getElementById('topScore').textContent = state.score + '점';
+        renderCornerList();
+        showToast('기존 점수 ' + state.score + '점 불러왔습니다!');
+      }
+    });
+  });
+
+  loadRankingFromSheet();
+
+  // pending 처리
+  const pending = sessionStorage.getItem('ilshim_pending');
+  if (pending) {
+    sessionStorage.removeItem('ilshim_pending');
+    const [type, id] = pending.split(':');
+    showTab('menu');
+    if (type === 'bonus') setTimeout(() => openBonus(id), 400);
+    if (type === 'stage') {
+      // 오프라인 QR 스캔 → 해당 스테이지 잠금 해제
+      if (state.offlineLocked) delete state.offlineLocked[id];
+      setTimeout(() => openCorner(id), 400);
+    }
+  } else {
+    showTab('menu');
+  }
+}
+
+// 초기 신호등 애니메이션 - 페이지 로드 완료 후 실행
+function runSignalAnim() {
+  var r = document.getElementById('s-red');
+  var y = document.getElementById('s-yellow');
+  var p = document.getElementById('s-purple');
+  if (!r || !y || !p) return;
+  setTimeout(function(){ r.classList.add('on'); }, 300);
+  setTimeout(function(){ y.classList.add('on'); }, 900);
+  setTimeout(function(){ p.classList.add('on'); }, 1500);
+}
+window.addEventListener('load', function() {
+  runSignalAnim();
+  handleURLParams();
+});
+</script>
+</body>
+</html>
